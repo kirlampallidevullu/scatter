@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="444c9f7c-2ff9-4ed5-849b-81fc8dbb292c" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="scatter-gatherFlow" doc:id="9eeb38f3-6ade-410b-8738-4c875e07dcf9" >
+		<http:listener doc:name="Listener" doc:id="c74dacd3-f996-4e44-805d-6b2fa09e4e9a" config-ref="HTTP_Listener_config" path="/scatter-gather"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="7819344c-b88f-4059-9ecf-9c717cbfcb79" >
+			<route >
+				<logger level="INFO" doc:name="Logger" doc:id="4dc4f581-9766-42f1-8117-a23518cdeeb3" message="1st logger   #[payload]"/>
+			</route>
+			<route >
+				<logger level="INFO" doc:name="Logger" doc:id="d8ed8d79-92f5-4553-aff6-1af9b62dbae0" message="#[payload]"/>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="171e9ae9-904a-4688-b691-52e9393b6df1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+---
+
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="5c07a9dd-80ae-4bec-ad2f-680d7de340c0" message="final logger #[payload[0].payload]"/>
+		<set-payload value="#[payload[0].payload]" doc:name="Set Payload" doc:id="69689eb6-26c4-4747-a761-f7a37e2be848" />
+	</flow>
+</mule>
